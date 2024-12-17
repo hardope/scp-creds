@@ -43,13 +43,33 @@ class UploadResponse(BaseModel):
     download_code: str
     decryption_key: str
 
+
 @app.post("/upload", response_model=UploadResponse)
-def upload_env(file: UploadFile, db: Session = Depends(get_db)):
+def upload_env(file: UploadFile, download_limit: int = 1, expiration_time: int = 5, db: Session = Depends(get_db)):
     try:
         file_content = file.file.read()
         decryption_key = Fernet.generate_key()
         fernet = Fernet(decryption_key)
         encrypted_data = fernet.encrypt(file_content)
+
+        download_code = str(uuid.uuid4())
+        env_file = EnvFile(id=download_code, encrypted_data=encrypted_data.decode())
+
+        db.add(env_file)
+        db.commit()
+
+        print(f"Download code: {download_limit}, Expiration time: {expiration_time}")
+
+        return {"download_code": download_code, "decryption_key": decryption_key.decode()}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error uploading file: {str(e)}")
+
+@app.post("/upload_text", response_model=UploadResponse)
+def upload_env_text(file_content: str = Form(...), db: Session = Depends(get_db)):
+    try:
+        decryption_key = Fernet.generate_key()
+        fernet = Fernet(decryption_key)
+        encrypted_data = fernet.encrypt(file_content.encode())
 
         download_code = str(uuid.uuid4())
         env_file = EnvFile(id=download_code, encrypted_data=encrypted_data.decode())
