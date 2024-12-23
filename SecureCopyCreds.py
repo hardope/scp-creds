@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 
-API_BASE_URL = "http://localhost:8000"  # Update with your FastAPI URL
+API_BASE_URL = "https://scp-env.onrender.com"  # Update with your FastAPI URL
 
 st.title("Secure Credentials File Sharing")
 
