@@ -2,7 +2,6 @@ import argparse
 import requests
 import os
 import sys
-import json
 
 def upload_env_file(file_path, download_limit, expiration_time):
     SERVER_URL = "https://scp-env.onrender.com"
