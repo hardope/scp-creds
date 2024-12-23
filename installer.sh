@@ -2,6 +2,7 @@
 
 # Move the executable to /usr/local/bin for global access
 INSTALL_DIR="/usr/local/bin"
+chmod +x scp-creds
 if [ ! -d "$INSTALL_DIR" ]; then
     sudo mkdir -p "$INSTALL_DIR"
 fi

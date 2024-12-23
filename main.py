@@ -60,8 +60,6 @@ def upload_env(file: UploadFile, download_limit: int = Form(1), expiration_time:
         db.add(env_file)
         db.commit()
 
-        print(f"Download Limit: {download_limit}, Expiration time: {expiration_time}")
-
         return {"download_code": download_code, "decryption_key": decryption_key.decode()}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error uploading file: {str(e)}")
@@ -100,7 +98,7 @@ def download_env(code: str, decryption_key: str, db: Session = Depends(get_db)):
     # Check expiration time
     if env_file.expiration_time is not None:
         time_elapsed = (datetime.utcnow() - env_file.created_at).total_seconds() / 60
-        print(f"Time elapsed: {time_elapsed}")
+        
         if time_elapsed > env_file.expiration_time:
             raise HTTPException(status_code=403, detail="File has expired")
 
@@ -116,6 +114,6 @@ def download_env(code: str, decryption_key: str, db: Session = Depends(get_db)):
 
     return StreamingResponse(memory_file, media_type="application/octet-stream", headers={"Content-Disposition": "attachment; filename=env_file.env"})
 
-if __name__ == "__main__":
+if __name__ == "__main__":  
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=10000)
